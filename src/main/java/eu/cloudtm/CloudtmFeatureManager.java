@@ -25,6 +25,22 @@ public abstract class CloudtmFeatureManager implements KeyFeatureManager {
       String[] decoded = StringUtils.decode((String) key);
       if (decoded.length > 1) {
          Map<Feature, FeatureValue> featureValueMap = new HashMap<Feature, FeatureValue>();
+         /*
+
+      LocalityHints may be stored in the keys, but each backend chooses how to
+      generate the keys used to store data.  This means that recovering the LH
+      required backend-specific knowledge.  The correct implementation should
+      be to call FenixFramework.getOwnerDomainObject((String)key).getLocalityHints()
+      which gets the LH for the DomainObject that owns the given key.
+
+      As a temporary hack, for the Infinispan direct mapper we agree to store
+      the LH in the decoded[1] field, it exists.
+
+      For the OGM backend, since FenixFramework does not control the generation
+      of the keys we will need support from Hibernate OGM to be able to get the
+      object that owns such key.
+
+         */
          LocalityHints hints = LocalityHints.string2Hints(decoded[1]);
          for (Feature feature : getAllKeyFeatures()) {
             String value = hints.get(feature.getName());
